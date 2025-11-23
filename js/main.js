@@ -13,7 +13,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isInFeishu = typeof window.h5sdk !== 'undefined' || 
                           typeof window.tt !== 'undefined' ||
                           window.location.href.includes('feishu.cn') ||
-                          window.location.href.includes('larkoffice.com');
+                          window.location.href.includes('larkoffice.com') ||
+                          document.referer.includes('feishu.cn') ||
+                          document.referer.includes('larkoffice.com');
+        
+        // 调试信息
+        console.log('环境检测:', {
+            h5sdk: typeof window.h5sdk !== 'undefined',
+            tt: typeof window.tt !== 'undefined',
+            location: window.location.href,
+            referer: document.referer,
+            userAgent: navigator.userAgent,
+            isInFeishu: isInFeishu
+        });
         
         if (isInFeishu) {
             await initFeishuSDK();

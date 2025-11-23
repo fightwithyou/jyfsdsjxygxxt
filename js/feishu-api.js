@@ -26,6 +26,14 @@ class FeishuAPI {
                 throw new Error('App ID 或 App Secret 未配置，请检查 js/config.js 文件');
             }
 
+            // 添加调试信息
+            console.log('准备调用飞书 API:', {
+                url: 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal',
+                origin: window.location.origin,
+                referer: document.referer,
+                userAgent: navigator.userAgent
+            });
+
             const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
                 method: 'POST',
                 mode: 'cors',
