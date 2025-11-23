@@ -28,6 +28,8 @@ class FeishuAPI {
 
             const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
                 method: 'POST',
+                mode: 'cors',
+                credentials: 'omit',
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8'
                 },
@@ -54,9 +56,22 @@ class FeishuAPI {
             }
         } catch (error) {
             console.error('获取 tenant_access_token 错误:', error);
+            console.error('错误详情:', {
+                message: error.message,
+                stack: error.stack,
+                appId: this.config.appId ? '已配置' : '未配置',
+                appSecret: this.config.appSecret ? '已配置' : '未配置'
+            });
+            
             // 提供更详细的错误信息
-            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                throw new Error('网络请求失败。请检查：1) 网络连接；2) 飞书开放平台配置；3) App ID 和 App Secret 是否正确');
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('CORS')) {
+                const errorMsg = '网络请求失败。可能的原因：\n' +
+                    '1) CORS 跨域问题 - 飞书 API 可能不允许从当前域名调用\n' +
+                    '2) 网络连接问题 - 请检查网络连接\n' +
+                    '3) 飞书开放平台配置 - 请检查是否配置了网页应用 URL 和权限\n' +
+                    '4) App ID 和 App Secret 配置错误\n\n' +
+                    '建议：在飞书开放平台配置网页应用 URL 后，通过飞书客户端访问应用';
+                throw new Error(errorMsg);
             }
             throw error;
         }
@@ -89,7 +104,14 @@ class FeishuAPI {
             finalOptions.body = JSON.stringify(finalOptions.body);
         }
 
-        const response = await fetch(url, finalOptions);
+        // 添加 CORS 配置
+        const finalFetchOptions = {
+            ...finalOptions,
+            mode: 'cors',
+            credentials: 'omit'
+        };
+
+        const response = await fetch(url, finalFetchOptions);
         
         // 检查响应状态
         if (!response.ok) {

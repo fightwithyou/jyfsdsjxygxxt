@@ -35,9 +35,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 加载配置数据（无论是否在飞书环境中，都可以调用 API）
         try {
             await loadConfigData();
+            // 如果加载成功，更新授权状态
+            if (isInFeishu) {
+                document.getElementById('authBtn').textContent = '已授权';
+                document.querySelector('.status-text').textContent = '已授权';
+            } else {
+                document.getElementById('authBtn').textContent = '已连接';
+                document.querySelector('.status-text').textContent = '已连接';
+            }
         } catch (error) {
             console.error('加载配置数据失败:', error);
-            showToast('加载配置数据失败: ' + error.message, 'error');
+            console.error('完整错误信息:', error);
+            // 显示更友好的错误信息
+            const errorMessage = error.message || '未知错误';
+            showToast('加载配置数据失败: ' + errorMessage, 'error');
         }
         
         // 加载模型数据（用于自动完成）
