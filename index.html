@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据血缘关系系统</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>数据血缘关系系统</h1>
+            <div class="auth-status" id="authStatus">
+                <span class="status-text">未授权</span>
+                <button id="authBtn" class="btn btn-primary">授权登录</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="query">查询模型</button>
+            <button class="tab-btn" data-tab="add-model">添加模型</button>
+            <button class="tab-btn" data-tab="delete-model">删除模型</button>
+            <button class="tab-btn" data-tab="add-lineage">添加血缘关系</button>
+            <button class="tab-btn" data-tab="delete-lineage">删除血缘关系</button>
+        </nav>
+
+        <!-- 查询模型 -->
+        <section id="query-tab" class="tab-content active">
+            <div class="card">
+                <h2>查询模型</h2>
+                <form id="queryForm">
+                    <div class="form-group">
+                        <label>数据仓库层级：</label>
+                        <select id="queryLevel" class="form-control" required>
+                            <option value="">请选择层级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>模型名称：</label>
+                        <input type="text" id="queryModelName" class="form-control" placeholder="支持模糊查询" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">查询</button>
+                </form>
+                <div id="queryResults" class="results-container"></div>
+            </div>
+        </section>
+
+        <!-- 添加模型 -->
+        <section id="add-model-tab" class="tab-content">
+            <div class="card">
+                <h2>添加模型</h2>
+                <form id="addModelForm">
+                    <div class="form-group">
+                        <label>模型名称 <span class="required">*</span>：</label>
+                        <input type="text" id="addModelName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>数据仓库层级 <span class="required">*</span>：</label>
+                        <select id="addModelLevel" class="form-control" required>
+                            <option value="">请选择层级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>模型注释 <span class="required">*</span>：</label>
+                        <input type="text" id="addModelComment" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>模型主题域 <span class="required">*</span>：</label>
+                        <select id="addModelSubject" class="form-control" required>
+                            <option value="">请选择主题域</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 删除模型 -->
+        <section id="delete-model-tab" class="tab-content">
+            <div class="card">
+                <h2>删除模型</h2>
+                <form id="deleteModelForm">
+                    <div class="form-group">
+                        <label>数据仓库层级：</label>
+                        <select id="deleteModelLevel" class="form-control" required>
+                            <option value="">请选择层级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>模型名称：</label>
+                        <input type="text" id="deleteModelName" class="form-control autocomplete-input" placeholder="支持模糊查询" required>
+                        <div id="deleteModelSuggestions" class="autocomplete-suggestions"></div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">删除</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 添加血缘关系 -->
+        <section id="add-lineage-tab" class="tab-content">
+            <div class="card">
+                <h2>添加数据模型血缘关系</h2>
+                <form id="addLineageForm">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <h3>来源模型</h3>
+                            <div class="form-group">
+                                <label>来源模型层级 <span class="required">*</span>：</label>
+                                <select id="sourceLevel" class="form-control" required>
+                                    <option value="">请选择层级</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>来源模型 <span class="required">*</span>：</label>
+                                <input type="text" id="sourceModel" class="form-control autocomplete-input" placeholder="支持模糊查询" required>
+                                <div id="sourceModelSuggestions" class="autocomplete-suggestions"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>来源模型主题域：</label>
+                                <input type="text" id="sourceSubject" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>来源模型注释：</label>
+                                <input type="text" id="sourceComment" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <h3>目标模型</h3>
+                            <div class="form-group">
+                                <label>目标模型层级 <span class="required">*</span>：</label>
+                                <select id="targetLevel" class="form-control" required>
+                                    <option value="">请选择层级</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>目标模型 <span class="required">*</span>：</label>
+                                <input type="text" id="targetModel" class="form-control autocomplete-input" placeholder="支持模糊查询" required>
+                                <div id="targetModelSuggestions" class="autocomplete-suggestions"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>目标模型主题域：</label>
+                                <input type="text" id="targetSubject" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>目标模型注释：</label>
+                                <input type="text" id="targetComment" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>任务名称 <span class="required">*</span>：</label>
+                        <input type="text" id="taskName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>任务位置 <span class="required">*</span>：</label>
+                        <input type="text" id="taskLocation" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>调度名称 <span class="required">*</span>：</label>
+                        <input type="text" id="scheduleName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>调度文件位置 <span class="required">*</span>：</label>
+                        <input type="text" id="scheduleLocation" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>备注：</label>
+                        <textarea id="remarks" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">添加血缘关系</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 删除血缘关系 -->
+        <section id="delete-lineage-tab" class="tab-content">
+            <div class="card">
+                <h2>删除数据模型血缘关系</h2>
+                <form id="deleteLineageForm">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <h3>来源模型</h3>
+                            <div class="form-group">
+                                <label>来源模型层级：</label>
+                                <select id="deleteSourceLevel" class="form-control" required>
+                                    <option value="">请选择层级</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>来源模型名称：</label>
+                                <input type="text" id="deleteSourceModel" class="form-control autocomplete-input" placeholder="支持模糊查询" required>
+                                <div id="deleteSourceSuggestions" class="autocomplete-suggestions"></div>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <h3>目标模型</h3>
+                            <div class="form-group">
+                                <label>目标模型层级：</label>
+                                <select id="deleteTargetLevel" class="form-control" required>
+                                    <option value="">请选择层级</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>目标模型名称：</label>
+                                <input type="text" id="deleteTargetModel" class="form-control autocomplete-input" placeholder="支持模糊查询" required>
+                                <div id="deleteTargetSuggestions" class="autocomplete-suggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">删除血缘关系</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button id="modalCancel" class="btn btn-secondary">取消</button>
+                <button id="modalConfirm" class="btn btn-danger">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="https://lf1-cdn-tos.bytegoofy.com/obj/goofy/lark/op/h5-js-sdk/lark/lark.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/feishu-api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "feishu-lineage-system",
+  "version": "1.0.0",
+  "description": "数据血缘关系系统 - 基于飞书在线表格",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server . -p 8080 -c-1",
+    "start": "npx http-server . -p 8080 -c-1"
+  },
+  "keywords": [
+    "feishu",
+    "lineage",
+    "data-warehouse"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
