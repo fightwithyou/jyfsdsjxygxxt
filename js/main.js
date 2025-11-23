@@ -10,12 +10,20 @@ let modelsData = [];
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 检查是否在飞书环境中
-        if (typeof window.h5sdk !== 'undefined') {
+        const isInFeishu = typeof window.h5sdk !== 'undefined' || 
+                          typeof window.tt !== 'undefined' ||
+                          window.location.href.includes('feishu.cn') ||
+                          window.location.href.includes('larkoffice.com');
+        
+        if (isInFeishu) {
             await initFeishuSDK();
+            document.getElementById('authBtn').textContent = '已授权';
+            document.querySelector('.status-text').textContent = '已授权';
         } else {
-            // 不在飞书环境中，提示用户
-            showToast('请在飞书客户端中打开此页面', 'error');
+            // 不在飞书环境中，但仍然可以调用 API（使用 tenant_access_token）
+            // 只是提示用户建议在飞书环境中使用
             document.getElementById('authBtn').textContent = '请使用飞书打开';
+            document.querySelector('.status-text').textContent = '未授权（建议在飞书客户端中使用）';
         }
         
         // 初始化标签页切换
@@ -24,11 +32,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 初始化表单
         initForms();
         
-        // 加载配置数据
-        await loadConfigData();
+        // 加载配置数据（无论是否在飞书环境中，都可以调用 API）
+        try {
+            await loadConfigData();
+        } catch (error) {
+            console.error('加载配置数据失败:', error);
+            showToast('加载配置数据失败: ' + error.message, 'error');
+        }
         
         // 加载模型数据（用于自动完成）
-        await loadModelsData();
+        try {
+            await loadModelsData();
+        } catch (error) {
+            console.error('加载模型数据失败:', error);
+            // 不显示错误提示，因为这不是关键功能
+        }
         
     } catch (error) {
         console.error('初始化错误:', error);

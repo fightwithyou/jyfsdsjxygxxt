@@ -21,6 +21,11 @@ class FeishuAPI {
                 return this.tenantAccessToken;
             }
 
+            // 检查配置
+            if (!this.config.appId || !this.config.appSecret) {
+                throw new Error('App ID 或 App Secret 未配置，请检查 js/config.js 文件');
+            }
+
             const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
                 method: 'POST',
                 headers: {
@@ -32,6 +37,11 @@ class FeishuAPI {
                 })
             });
 
+            // 检查响应状态
+            if (!response.ok) {
+                throw new Error(`HTTP 错误: ${response.status} ${response.statusText}`);
+            }
+
             const data = await response.json();
             
             if (data.code === 0) {
@@ -40,10 +50,14 @@ class FeishuAPI {
                 this.ttl = Date.now() + (data.expire - 300) * 1000;
                 return this.tenantAccessToken;
             } else {
-                throw new Error(`获取 tenant_access_token 失败: ${data.msg}`);
+                throw new Error(`获取 tenant_access_token 失败: ${data.msg || JSON.stringify(data)}`);
             }
         } catch (error) {
             console.error('获取 tenant_access_token 错误:', error);
+            // 提供更详细的错误信息
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                throw new Error('网络请求失败。请检查：1) 网络连接；2) 飞书开放平台配置；3) App ID 和 App Secret 是否正确');
+            }
             throw error;
         }
     }
@@ -76,6 +90,12 @@ class FeishuAPI {
         }
 
         const response = await fetch(url, finalOptions);
+        
+        // 检查响应状态
+        if (!response.ok) {
+            throw new Error(`HTTP 错误: ${response.status} ${response.statusText}`);
+        }
+        
         const data = await response.json();
 
         if (data.code !== 0) {
