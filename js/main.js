@@ -10,12 +10,13 @@ let modelsData = [];
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 检查是否在飞书环境中
+        const referer = document.referer || '';
         const isInFeishu = typeof window.h5sdk !== 'undefined' || 
                           typeof window.tt !== 'undefined' ||
                           window.location.href.includes('feishu.cn') ||
                           window.location.href.includes('larkoffice.com') ||
-                          document.referer.includes('feishu.cn') ||
-                          document.referer.includes('larkoffice.com');
+                          (referer && referer.includes('feishu.cn')) ||
+                          (referer && referer.includes('larkoffice.com'));
         
         // 调试信息
         console.log('环境检测:', {
