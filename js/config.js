@@ -1,7 +1,7 @@
 // 飞书应用配置
 const FEISHU_CONFIG = {
     appId: 'cli_a9940b366578dbda',
-    appSecret: 'a4ikDNxgA75OBMhKyMxv7n66LiJm7K45',
+    appSecret: 'a4ikDNxgA750BMhKyMxv7n66LiJm7K45',
     // 飞书在线表格的 token
     // 这个需要通过飞书开放平台获取，或者从 URL 中提取
     spreadsheetToken: 'UaKcs5KPuhTS9WtCxJrckBESnod',
